@@ -22,6 +22,7 @@ export const postJoin = async (req, res) => {
 
 export const postLogin = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   const user = await User.findOne({ email, password });
 
   if (!user) {
@@ -30,29 +31,36 @@ export const postLogin = async (req, res) => {
 
   req.session.user = user;
   req.session.loggedIn = true;
+
+  // 세션 쿠키를 클라이언트로 전송
+  res.cookie('connect.sid', req.sessionID, { httpOnly: true });
+
   return res.json(user);
 };
 
+// getMe 컨트롤러 수정
 export const getMe = async (req, res) => {
   try {
-    const {
-      session: { user },
-    } = req;
+    const { user, loggedIn } = req.session;
+    const { email, password, username } = user;
 
     console.log(user);
 
-    if (!user) {
+    if (!loggedIn || !user) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
-    return res.json(user);
+    return res.json({ email, password, username });
   } catch (error) {
     console.error('Error in getMe:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
+// logOut 컨트롤러 수정
 export const logOut = async (req, res) => {
   req.session.destroy();
+  // 세션 쿠키 삭제
+  res.clearCookie('connect.sid');
   return res.json({ message: 'LogOut success' });
 };

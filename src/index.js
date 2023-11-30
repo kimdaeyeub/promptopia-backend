@@ -1,32 +1,33 @@
 import './db';
 import './models/User';
-import express from 'express';
+import express, { urlencoded } from 'express';
 import morgan from 'morgan';
 import userRouter from './router/userRouter';
-import { localMiddlewares } from './middlewares';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const PORT = 8888;
 const logger = morgan('dev');
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(urlencoded({ extended: true }));
 app.use(logger);
+app.use(cookieParser());
 app.use(
   session({
     secret: 'Hello',
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: 'mongodb://127.0.0.1:27017/promptopia',
     }),
   }),
 );
 
-app.use(localMiddlewares);
 app.get('/', (req, res) => {
   return res.send({ message: 'Hello World' });
 });
