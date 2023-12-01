@@ -31,7 +31,6 @@ export const postJoin = async (req, res) => {
 
 export const postLogin = async (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
   const user = await User.findOne({ email, password });
 
   if (!user) {
