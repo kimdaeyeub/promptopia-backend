@@ -2,9 +2,11 @@ import Prompt from '../models/Prompt';
 
 //홈화면에 띄워주기 위해 모든 프롬프트를 가져온다.
 export const getAllPrompt = async (req, res) => {
-  const prompts = await Prompt.find({}).populate('creator');
-  console.log(prompts);
-  return res.json(JSON.stringify(prompts));
+  const prompts = await Prompt.find({}).populate({
+    path: 'creator',
+    select: 'username email',
+  });
+  return res.json(prompts);
 };
 
 //프롬프트를 추가하기 위함
@@ -25,7 +27,6 @@ export const addNewPrompt = async (req, res) => {
 
     return res.json(newPrompt);
   } catch (error) {
-    console.log(error);
     return res.json({ message: error });
   }
 };
@@ -77,7 +78,7 @@ export const getMyPrompt = async (req, res) => {
 
   const userId = req.session.user._id;
   const prompts = await Prompt.find({ creator: userId });
-  return res.json(JSON.stringify(prompts));
+  return res.json(prompts);
 };
 
 export const deletePrompt = async (req, res) => {

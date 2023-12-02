@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   },
   avatarUrl: {
     type: String,
-    required: [true, 'AvatarUrl is required'],
+    default: '',
   },
 });
 

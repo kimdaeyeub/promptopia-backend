@@ -2,16 +2,11 @@ import User from '../models/User';
 
 export const postJoin = async (req, res) => {
   const { username, password, email, avatarUrl } = req.body;
-  let image = '';
   //유저의 입력정보가 전달이 잘 되지 않을때의 에러
   if (username === '' || password === '' || email === '') {
     return res.send({
       message: '유저네임, 이메일, 비밀번호는 필수입력 요소입니다.',
     });
-  }
-
-  if (avatarUrl) {
-    image = avatarUrl;
   }
 
   //해당 정보의 유저가 이미 존재할때의 에러핸들링
@@ -24,7 +19,7 @@ export const postJoin = async (req, res) => {
     username,
     password,
     email,
-    avatarUrl: image,
+    avatarUrl,
   });
   return res.json(newUser);
 };
@@ -50,17 +45,14 @@ export const postLogin = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     const { user, loggedIn } = req.session;
-    const { email, password, username, avatarUrl } = user;
-
-    console.log(user);
+    const { email, username, avatarUrl, _id } = user;
 
     if (!loggedIn || !user) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
-    return res.json({ email, password, username, avatarUrl });
+    return res.json({ email, username, avatarUrl, _id });
   } catch (error) {
-    console.error('Error in getMe:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };

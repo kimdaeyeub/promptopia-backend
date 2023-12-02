@@ -7,6 +7,8 @@ import {
   getMyPrompt,
 } from '../controllers/promptController';
 
+//app.use('/api/v1/prompt', promptRouter);
+
 const promptRouter = express.Router();
 
 promptRouter.get('/', getAllPrompt);
