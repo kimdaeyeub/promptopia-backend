@@ -31,6 +31,21 @@ export const addNewPrompt = async (req, res) => {
   }
 };
 
+export const getEditPrompt = async (req, res) => {
+  const { promptId } = req.params;
+
+  try {
+    const prompt = await Prompt.findById(promptId).populate({
+      path: 'creator',
+      select: 'username email',
+    });
+    return res.json(prompt);
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: '해당 ID의 글이 존재하지 않습니다.' });
+  }
+};
+
 //만들어져있는 프롬프트를 편집하기 위함
 export const editPrompt = async (req, res) => {
   const { promptId } = req.params;
@@ -77,7 +92,10 @@ export const getMyPrompt = async (req, res) => {
   }
 
   const userId = req.session.user._id;
-  const prompts = await Prompt.find({ creator: userId });
+  const prompts = await Prompt.find({ creator: userId }).populate({
+    path: 'creator',
+    select: 'username email',
+  });
   return res.json(prompts);
 };
 

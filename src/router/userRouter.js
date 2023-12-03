@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  editProfile,
   getMe,
   logOut,
   postJoin,
@@ -12,5 +13,6 @@ userRouter.post('/login', postLogin);
 userRouter.post('/join', postJoin);
 userRouter.post('/logout', logOut);
 userRouter.get('/me', getMe);
+userRouter.patch('/edit', editProfile);
 
 export default userRouter;
