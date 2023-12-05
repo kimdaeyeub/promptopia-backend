@@ -19,20 +19,17 @@ app.use(express.json());
 app.use(urlencoded({ extended: true }));
 app.use(logger);
 app.use(cookieParser());
+
 app.use(
   session({
-    secret: 'Hello',
+    secret: 'secret',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     store: MongoStore.create({
       mongoUrl: 'mongodb://127.0.0.1:27017/promptopia',
     }),
   }),
 );
-
-app.get('/', (req, res) => {
-  return res.send({ message: 'Hello World' });
-});
 
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/prompt', promptRouter);

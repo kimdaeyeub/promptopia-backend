@@ -38,22 +38,26 @@ export const postLogin = async (req, res) => {
   // 세션 쿠키를 클라이언트로 전송
   res.cookie('connect.sid', req.sessionID, { httpOnly: true });
 
+  console.log(req.session.user);
   return res.json(user);
 };
 
 // getMe 컨트롤러 수정
-export const getMe = async (req, res) => {
+export const getMe = async(req, res) => {
   try {
-    const { user, loggedIn } = req.session;
-    const { email, username, avatarUrl, _id } = user;
-
+    const { user, loggedIn } = await req.session;
+    // TODO:어떨때는 user에 값이 있고 어쩔때는 존재하지 않음.
+    console.log(req.session);
     if (!loggedIn || !user) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
+    const { email, username, avatarUrl, _id } = user;
     return res.json({ email, username, avatarUrl, _id });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.log(error);
+    console.log(error.stack);
+    return res.json({ error: 'Internal Server Error' });
   }
 };
 
@@ -61,7 +65,6 @@ export const getMe = async (req, res) => {
 export const logOut = async (req, res) => {
   req.session.destroy();
   // 세션 쿠키 삭제
-  res.clearCookie('connect.sid');
   return res.json({ message: 'LogOut success' });
 };
 
@@ -83,10 +86,9 @@ export const editProfile = async (req, res) => {
       avatarUrl,
     });
 
-    req.session.destroy();
-    res.clearCookie('connect.sid');
     req.session.user = updatedUser;
-    res.cookie('connect.sid', req.sessionID, { httpOnly: true });
+    //await req.session.save();
+    console.log(req.session.user);
     return res.json(updatedUser);
   } catch (error) {
     return res.json({ message: '실패하였습니다.' });
