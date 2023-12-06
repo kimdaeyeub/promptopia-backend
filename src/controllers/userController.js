@@ -1,4 +1,6 @@
+import { session } from 'passport';
 import User from '../models/User';
+import { Query } from 'mongoose';
 
 export const postJoin = async (req, res) => {
   const { username, password, email, avatarUrl } = req.body;
@@ -24,35 +26,18 @@ export const postJoin = async (req, res) => {
   return res.json(newUser);
 };
 
-export const postLogin = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email, password });
-
-  if (!user) {
-    return res.send({ message: '해당 정보의 유저가 존재하지 않습니다.' });
-  }
-
-  req.session.user = user;
-  req.session.loggedIn = true;
-
-  // 세션 쿠키를 클라이언트로 전송
-  res.cookie('connect.sid', req.sessionID, { httpOnly: true });
-
-  console.log(req.session.user);
-  return res.json(user);
-};
-
 // getMe 컨트롤러 수정
-export const getMe = async(req, res) => {
+export const getMe = async (req, res) => {
   try {
-    const { user, loggedIn } = await req.session;
+    const { loggedIn } = req.session;
+    const { user } = req.session.passport;
     // TODO:어떨때는 user에 값이 있고 어쩔때는 존재하지 않음.
-    console.log(req.session);
     if (!loggedIn || !user) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
-    const { email, username, avatarUrl, _id } = user;
+    const userData = await User.findById(user);
+    const { email, username, avatarUrl, _id } = userData;
     return res.json({ email, username, avatarUrl, _id });
   } catch (error) {
     console.log(error);
